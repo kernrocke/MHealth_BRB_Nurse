@@ -26,9 +26,11 @@ cls
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
 	local datapath "/Users/kernrocke/Library/Mobile Documents/com~apple~CloudDocs/Github/MHealth_BRB_nurse" // Kern encrypted local
+	
+	*User community commands
+	ssc install vreverse, replace
 
 ** HEADER -----------------------------------------------------
-
 
 *Import excel dataset into environment
 import excel "`datapath'/1.input/Mental Health Attitude Scale Full Excel.xlsx",  sheet("Sheet1") cellrange(A2:CD121) firstrow clear
@@ -78,6 +80,11 @@ foreach var in `old_var_pre' {
     local ++num_pre
 }
 
+** Reverse recode
+foreach x of varlist omhs_pre_6 omhs_pre_7 omhs_pre_8 omhs_pre_14{
+	vreverse `x', gen(`x'_r)	
+}
+
 *Post
 local old_var_post "K M O Q S U W Y AA AC AE AG AI AK AM"
 
@@ -91,7 +98,36 @@ foreach var in `old_var_post' {
 	local ++num_post
 	
 }
+
+** Reverse recode
+foreach x of varlist omhs_post_6 omhs_post_7 omhs_post_8 omhs_post_14{
+	vreverse `x', gen(`x'_r)	
+}
+
 macro drop _all
+
+*Overall scoring
+*Pre
+egen attitude_omhs_pre = rowtotal(omhs_pre_9 omhs_pre_1 omhs_pre_10 omhs_pre_11 omhs_pre_13 omhs_pre_15)
+label var attitude_omhs_pre "Attitude of health care providers towards people with mental illness"
+egen disclosure_omhs_pre = rowtotal(omhs_pre_3 omhs_pre_4 omhs_pre_5 omhs_pre_8)
+label var disclosure_omhs_pre "Disclosure/help seeking"
+egen social_omhs_pre = rowtotal(omhs_pre_2 omhs_pre_6 omhs_pre_7 omhs_pre_12 omhs_pre_14)
+label var social_omhs_pre "Social Distance"
+egen omhs_score_pre = rowtotal(omhs_pre_1 omhs_pre_2 omhs_pre_3 omhs_pre_4 omhs_pre_5 omhs_pre_6 omhs_pre_7 omhs_pre_8 omhs_pre_9 omhs_pre_10 omhs_pre_11 omhs_pre_12 omhs_pre_13 omhs_pre_14 omhs_pre_15)
+label var omhs_score_pre "Overal OMHS Score"
+
+
+*Post
+egen attitude_omhs_post = rowtotal(omhs_post_9 omhs_post_1 omhs_post_10 omhs_post_11 omhs_post_13 omhs_post_15)
+label var attitude_omhs_post "Attitude of health care providers towards people with mental illness"
+egen disclosure_omhs_post = rowtotal(omhs_post_3 omhs_post_4 omhs_post_5 omhs_post_8)
+label var disclosure_omhs_post "Disclosure/help seeking"
+egen social_omhs_post = rowtotal(omhs_post_2 omhs_post_6 omhs_post_7 omhs_post_12 omhs_post_14)
+label var social_omhs_post "Social Distance"
+egen omhs_score_post = rowtotal(omhs_post_1 omhs_post_2 omhs_post_3 omhs_post_4 omhs_post_5 omhs_post_6 omhs_post_7 omhs_post_8 omhs_post_9 omhs_post_10 omhs_post_11 omhs_post_12 omhs_post_13 omhs_post_14 omhs_post_15)
+label var omhs_score_post "Overal OMHS Score"
+
 *-------------------------------------------------------------------------------
 
 *MICA-4
@@ -110,6 +146,11 @@ foreach var in `old_var_pre' {
     local ++num_pre
 }
 
+*Overall score
+egen mica_score_pre = rowtotal(mica_pre_1 mica_pre_2 mica_pre_3 mica_pre_4 mica_pre_5 mica_pre_6 mica_pre_7 mica_pre_8 mica_pre_9 mica_pre_10 mica_pre_11 mica_pre_12 mica_pre_13 mica_pre_14 mica_pre_15 mica_pre_16)
+label var mica_score_pre "MICA Overall score"
+
+
 *Post
 local old_var_post "AZ BB BD BF BH BJ BL BN BP BR BT BV BX BZ CB CD"
 
@@ -123,6 +164,10 @@ foreach var in `old_var_post' {
 	local ++num_post
 	
 }
+
+*Overall score
+egen mica_score_post = rowtotal(mica_post_1 mica_post_2 mica_post_3 mica_post_4 mica_post_5 mica_post_6 mica_post_7 mica_post_8 mica_post_9 mica_post_10 mica_post_11 mica_post_12 mica_post_13 mica_post_14 mica_post_15 mica_post_16)
+label var mica_score_post "MICA Overall score"
 macro drop _all
 
 *-------------------------------------------------------------------------------
